@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <!-- <link rel="shortcut icon" href="/img/favicon.ico"> -->
+    <!-- 自定义图标 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+
+    <title>
+        
+            手把手搭个操作系统（一） - BlackTom的博客 |  BlackTom&#39;s Blog
+                
+    </title>
+
+    <link rel="canonical" href="https://blacktomm.github.io/2021/08/19/operating-system-step-01/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+        <!-- Custom CSS -->
+        
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+            <!-- Pygments Highlight CSS -->
+            
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+                <!-- Custom Fonts -->
+                <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+                <!-- Hux change font-awesome CDN to qiniu -->
+                <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+                <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+                <!-- ga & ba script hoook -->
+                <script></script>
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="BlackTom's Blog" type="application/atom+xml">
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">BlackTom&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header {
+        background-image: url('https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/my-blog/blog-config/back2.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                
+                    <h2>
+                        手把手搭个操作系统（一）
+                    </h2>
+                    <h3 class="subheading">
+                        
+                    </h3>
+                      <div class="tags">
+                        
+                            <a class="tag" href="/tags/#programming" title="programming">
+                                programming
+                            </a>
+                            
+                            <a class="tag" href="/tags/#operating system" title="operating system">
+                                operating system
+                            </a>
+                            
+                    </div>
+                    <br>
+                    <span class="meta">
+                        Posted by Black Tom on
+                        2021-08-19
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>本篇是操作系统实战的第一篇，主要讲述如何利用 bochs 创建启动盘。</p>
+<h2 id="配置Bochs"><a href="#配置Bochs" class="headerlink" title="配置Bochs"></a>配置Bochs</h2><h3 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h3><p>Bochs 需要在 X11 环境下运行，因此你的 Linux 系统必须已经安装了X Window 系统才能使用Bochs。 因为 Bochs 是用C++写的，所以这里要安装GNU gcc/g++编译器。<br> 安装命令如下：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><code class="hljs csharp">sudo apt-<span class="hljs-keyword">get</span> install build-essential <br>sudo apt-<span class="hljs-keyword">get</span> install xorg-dev <br>sudo apt-<span class="hljs-keyword">get</span> install bison <br>sudo apt-<span class="hljs-keyword">get</span> install g++<br></code></pre></td></tr></table></figure>
+
+<p>别忘了安装<code>bochs-x</code></p>
+<h3 id="下载并安装"><a href="#下载并安装" class="headerlink" title="下载并安装"></a>下载并安装</h3><ul>
+<li><p>去<a href="https://sourceforge.net/projects/bochs/files/" target="_blank" rel="noopener">官网</a>下载 bochs-2.6.11.tar.gz</p>
+</li>
+<li><p>解压缩 tar -vxzf bochs-2.6.11.tar.gz并进入解压目录bochs-2.6.11</p>
+</li>
+<li><p>配置boch，在bochs-2.6.11目录下执行</p>
+  <figure class="highlight subunit"><table><tr><td class="code"><pre><code class="hljs subunit">./configure --prefix=/home/onedy/Public/software/bochs/bochs-pre --enable-debugger --enable-disasm --enable-iodebug --enable-iodebug --enable-x86-debugger --with-x --with-x11 libs='-lx11'<br><br>如果出现错误，根据提示修改，如<br><span class="hljs-keyword">ERROR: </span>pkg-config was not found, or unable to access the gtk+<span class="hljs-string">-2</span>.0 package.<br>Install pkg-config and the gtk+ development package,<br>or disable the gui debugger, or the wxWidgets display library (whichever is being used).<br><br>说明需要安装gtk+<span class="hljs-string">-2</span>.0<br>sudo apt-get install gtk2.0<br>参考自 https://askubuntu.com/questions/765526/how-to-install-gtk2<span class="hljs-string">-0</span><br></code></pre></td></tr></table></figure>
+
+<p>  注意各行结尾的’&#39;字符前面有个空格。下面简要说明一下configure 的参数。</p>
+  <figure class="highlight haml"><table><tr><td class="code"><pre><code class="hljs haml">-<span class="ruby">-prefix=<span class="hljs-regexp">/your_path/bochs</span> 是用来指定bochs 的安装目录，根据个人实际情况将your_path 替换为自己待安装的路径。</span><br><span class="ruby">--enable-debugger 打开bochs 自己的调试器。</span><br><span class="ruby">--enable-disasm 使bochs 支持反汇编。</span><br><span class="ruby">--enable-iodebug 启用io 接口调试器。</span><br><span class="ruby">--enable-x86-debugger 支持x86 调试器。</span><br><span class="ruby">--with-x 使用x windows。</span><br><span class="ruby">--with-x11 使用x11 图形用户接口。</span><br></code></pre></td></tr></table></figure>
+
+<p>  上面的编译参数是不支持gdb 远程调试的，如果想用gdb 调试，就要将参数–enable-debugger 替换为<br>  –enable-gdb-stub。<br>  –enable-gdb-stub 用来打开对gdb 的支持，这样我们就可以用gdb 来远程调试了。<br>  不过，需要注意的是不能同时打开这两个开关，否则bochs 会报错，即configure：error：–enable-debugger and –enable-gdb-stub are mutually exclusive。<br>  也就是说，bochs 本身是支持调试的，要么用本身的调试功能，要么用gdb 的调试功能，鱼和熊掌在一台模拟器上不可兼得。</p>
+</li>
+</ul>
+<ul>
+<li><p>正确运行后，会产生一个Makefile文件，然后 sudo make，如果执行不成功，需要排查后做make clean，再执行sudo make</p>
+</li>
+<li><p>安装 sudo make install，就会在指定的bochs 安装目录下（如/home/onedy/Public/software/bochs/bochs-pre）生成对应文件</p>
+</li>
+</ul>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>安装好bochs之后我们要对它进行配置，这个配置大家可以参考安装目录下的bochsrc-sample.txt，该文件的路径在bochs安装目录下的share/doc/bochs/bochsrc-sample.txt，部分代码如下</p>
+<figure class="highlight clean"><table><tr><td class="code"><pre><code class="hljs clean">###############################################<br># Configuration file for Bochs<br>###############################################<br><br><span class="hljs-number">1.5</span> 运行bochs<br><span class="hljs-number">49</span><br># 第一步，首先设置Bochs 在运行过程中能够使用的内存，本例为<span class="hljs-number">32</span>MB。<br># 关键字为：megs<br>megs:<span class="hljs-number">32</span><br><br># 第二步，设置对应真实机器的BIOS 和VGA BIOS。<br># 对应两个关键字为：romimage 和 vgaromimage<br>romimage: file=/实际路径/bochs/share/bochs/BIOS-bochs-latest<br>vgaromimage: file=/实际路径/bochs/share/bochs/VGABIOS-lgpl-latest<br><br># 第三步，设置Bochs 所使用的磁盘，软盘的关键字为floppy。<br># 若只有一个软盘，则使用floppya 即可，若有多个，则为floppya，floppyb…<br>#floppya: <span class="hljs-number">1</span>_44=a.img, status=inserted<br><br># 第四步，选择启动盘符。<br>#boot: floppy #默认从软盘启动，将其注释<br>boot: disk #改为从硬盘启动。我们的任何代码都将直接写在硬盘上，所以不会再有读写软盘的操作。<br><br># 第五步，设置日志文件的输出。<br>log: bochs.out<br><br># 第六步，开启或关闭某些功能。<br># 下面是关闭鼠标，并打开键盘。<br>mouse: enabled=<span class="hljs-number">0</span><br>keyboard_mapping: enabled=<span class="hljs-number">1</span>,<br>map=/实际路径/bochs/share/bochs/keymaps/x11-pc-us.map<br><br># 硬盘设置<br>ata0: enabled=<span class="hljs-number">1</span>, ioaddr1=<span class="hljs-number">0x1f0</span>, ioaddr2=<span class="hljs-number">0x3f0</span>, irq=<span class="hljs-number">14</span><br><br># 下面的是增加的bochs 对gdb 的支持，这样gdb 便可以远程连接到此机器的<span class="hljs-number">1234</span> 端口调试了<br>gdbstub: enabled=<span class="hljs-number">1</span>, port=<span class="hljs-number">1234</span>, text_base=<span class="hljs-number">0</span>, data_base=<span class="hljs-number">0</span>, bss_base=<span class="hljs-number">0</span><br>################### 配置文件结束 #####################<br></code></pre></td></tr></table></figure>
+
+<p>好了，现在将上面的配置文件存为<strong>bochsrc.disk 放在bochs 安装目录</strong>下。（bochs 配置文件位置不固定，<br>名字也不要求固定），后缀.disk 是我人为加的，为了表示此配置文件配置的内容是从硬盘启动，这样较明确。</p>
+<p>个人配置文件 bochsrc.disk 如下，放置于bochs安装目录下</p>
+<figure class="highlight dts"><table><tr><td class="code"><pre><code class="hljs dts"><span class="hljs-meta">#首先设置 Bochs 在运行过程中能够使用的内存，本例为 32MB。</span><br><span class="hljs-meta">#关键字为 megs</span><br><span class="hljs-symbol">megs:</span><span class="hljs-number">32</span><br><br><span class="hljs-meta">#设置对应真实机器的 BIOS 和 VGA BIOS 。</span><br><span class="hljs-meta">#对应两个关键字为 ： romimage 和 vgaromimage</span><br><span class="hljs-meta">#romimage:file=安装目录/share/bochs/BIOS-bochs-latest</span><br><span class="hljs-symbol">romimage:</span>file=<span class="hljs-meta-keyword">/home/</span>onedy/Public<span class="hljs-meta-keyword">/software/</span>bochs<span class="hljs-meta-keyword">/bochs-pre/</span>share<span class="hljs-meta-keyword">/bochs/</span>BIOS-bochs-latest<br><span class="hljs-symbol">vgaromimage:</span>file=<span class="hljs-meta-keyword">/home/</span>onedy/Public<span class="hljs-meta-keyword">/software/</span>bochs<span class="hljs-meta-keyword">/bochs-pre/</span>share<span class="hljs-meta-keyword">/bochs/</span>VGABIOS-lgpl-latest <br><br><span class="hljs-meta">#选择启动盘符</span><br><span class="hljs-symbol">boot:</span>disk  <span class="hljs-meta">#从硬盘启动</span><br><br><span class="hljs-meta"># 设置日志文件的输入位置</span><br><span class="hljs-meta">#log:bochs.out</span><br><span class="hljs-symbol">log:</span>bochsout.txt <br><br><span class="hljs-meta"># 关闭鼠标，打开键盘</span><br><span class="hljs-symbol">mouse:</span>enabled=<span class="hljs-number">0</span><br><span class="hljs-symbol">keyboard:</span>keymap=<span class="hljs-meta-keyword">/home/</span>onedy/Public<span class="hljs-meta-keyword">/software/</span>bochs<span class="hljs-meta-keyword">/bochs-pre/</span>share<span class="hljs-meta-keyword">/bochs/</span>keymaps/x11-pc-us.map<br><br><span class="hljs-meta"># 设置硬盘</span><br><span class="hljs-symbol">ata0:</span>enabled=<span class="hljs-number">1</span>,ioaddr1=<span class="hljs-number">0x1f0</span>,ioaddr2=<span class="hljs-number">0x3f0</span>,irq=<span class="hljs-number">14</span><br><span class="hljs-meta"># 启动盘信息，需要先创建</span><br>ata0-master:type=disk,path=<span class="hljs-string">"hd60M.img"</span>, mode=flat,cylinders=<span class="hljs-number">121</span>,heads=<span class="hljs-number">16</span>,spt=<span class="hljs-number">63</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注意中英文标点差异，键值对冒号不可省略，注释#号为英文字符</strong></p>
+<h4 id="创建启动盘"><a href="#创建启动盘" class="headerlink" title="创建启动盘"></a>创建启动盘</h4><p>在安装目录下执行</p>
+<figure class="highlight elixir"><table><tr><td class="code"><pre><code class="hljs elixir">onedy<span class="hljs-variable">@onedy</span><span class="hljs-symbol">:~/Public/software/bochs/bochs-pre</span><span class="hljs-variable">$ </span>bin/bximage<br></code></pre></td></tr></table></figure>
+
+<p>除指定硬盘大小外，其他选择默认即可</p>
+<p><img src="https://pic1.zhimg.com/80/v2-eb962cd79784c2c55fb75ac21263bbdc_720w.jpg" alt=""></p>
+<p><img src="https://pic4.zhimg.com/80/v2-176cc91883d40826aef180e3a7096097_720w.jpg" alt=""></p>
+<p>60代表该硬盘的大小为60M，hd60M.img是我给改硬盘取得名字，最后一行用绿色标记的是我们需要加入到配置文件中的，这是我们硬盘配置好之后，bochs给我们自动生成的硬盘信息，接下来在配置文件的最后一行加上该硬盘的信息，上面已加入配置文件信息。</p>
+<h4 id="启动Bochs"><a href="#启动Bochs" class="headerlink" title="启动Bochs"></a>启动Bochs</h4><p>hd60M.img与配置文件均放在安装目录下/home/onedy/Public/software/bochs/bochs-pre，因为需要读取当前文件夹内容进行启动，具体如下</p>
+<figure class="highlight elixir"><table><tr><td class="code"><pre><code class="hljs elixir">onedy<span class="hljs-variable">@onedy</span><span class="hljs-symbol">:~/Public/software/bochs/bochs-pre</span><span class="hljs-variable">$ </span>bin/bochs -f bochsrc.disk<br></code></pre></td></tr></table></figure>
+
+<p>然后选择启动模拟器</p>
+<p><img src="https://pic2.zhimg.com/80/v2-8123759ab91d8e6b8d2f6e846e9703d9_720w.jpg" alt=""></p>
+<p>由于开启了调试模式，会显示模拟器黑框，在<strong>控制台输入c</strong>，enter后会显示如下界面</p>
+<p><img src="https://pic2.zhimg.com/80/v2-d2ce4d4cc2b311e8464d78927cc33559_720w.jpg" alt=""></p>
+<p>如果嫌每次启动必须进入bochs文件下，输入这么多字麻烦，可以直接用别名来代替</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><code class="hljs shell">cd ~<br>vim .bashrc<br>alias bochs='/home/onedy/Public/software/bochs/bochs-pre/bin/bochs -f /home/onedy/Public/software/bochs/bochs-pre/bochsrc.disk'<br>source .bashrc<br></code></pre></td></tr></table></figure>
+
+<h4 id="Bochs调试"><a href="#Bochs调试" class="headerlink" title="Bochs调试"></a>Bochs调试</h4><figure class="highlight groovy"><table><tr><td class="code"><pre><code class="hljs groovy">打开bochsdbg 启动调试<br>启动后 会在命令行窗口看到 jmpf <span class="hljs-number">0xf000</span>:e05b 说明准备跳转到bios中,还未执行 显示的指令是下一条执行的指令<br>为何物理地址是<span class="hljs-number">0x0000ffffff0</span>?因为当前boch的地址线是32根,然后bochs用64位宽度来表示,现代处理器启动时会把cs的内容设为0xF000,ip的内容设为0xfff0,<br>而且会把其余的高位部分的地址线拉高,因为人们想把bios放在内存的高地址<br>s:单步执行<br><span class="hljs-string">b:</span>设置断点 <span class="hljs-string">"b 0x7c00"</span>意思是处理器执行到地址<span class="hljs-string">"0x7c00"</span>的地方前停下来 再按c<br><span class="hljs-string">c:</span>继续执行<br><span class="hljs-string">r:</span>显示寄存器内容<br><span class="hljs-string">xp:</span>显示显存中的内容<br><span class="hljs-string">q:</span>退出<br><span class="hljs-string">n:</span>自动完成程序中循环 但是对条件转移命令无效(jns等)<br><span class="hljs-string">u:</span>反汇编 可用于越过jns等<br>info <span class="hljs-string">eflags:</span>显示标志寄存器 如果标志名称是小写的,那么该标记为<span class="hljs-number">0</span>,否则为<span class="hljs-number">1</span><br>print-stack x 可以查看当前的栈 x代表显示的数据 如果不使用参数 默认显示前<span class="hljs-number">16</span>个字<br></code></pre></td></tr></table></figure>
+
+<h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ul>
+<li>操作系统真相还原 第1章</li>
+<li><a href="https://zhuanlan.zhihu.com/p/35437842" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/35437842</a> 配置文件有点小问题</li>
+<li><a href="https://copyright1999.github.io/2020/03/23/Ubuntu18.10%E5%AE%89%E8%A3%85bochs/" target="_blank" rel="noopener">Ubuntu18.10安装bochs</a></li>
+<li>[Ubuntu下Bochs安装与调试配置](</li>
+</ul>
+
+
+                    <hr>
+
+
+                    
+
+                            <ul class="pager">
+                                
+                                        
+                                            <li class="next">
+                                                <a href="/2020/07/29/huxblog-optimization/" data-toggle="tooltip" data-placement="top" title="huxblog配置优化">Next &rarr;</a>
+                                            </li>
+                                            
+                            </ul>
+
+                            
+
+                                    
+
+                                            
+                                                <!-- gitalk 评论框 start -->
+                                                <div class="comment">
+                                                    <div id="gitalk-container"></div>
+                                                </div>
+                                                <!-- gitalk 评论框 end -->
+                                                
+            </div>
+
+            <!-- Side Catalog Container -->
+            
+
+                    <!-- Sidebar Container -->
+
+                    <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                        <!-- Featured Tags -->
+                        
+
+                                <!-- Friends Blog -->
+                                
+                    </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+        
+
+                
+                    <!-- Gitalk start -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+                    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+                    <script>
+                        var gitalk = new Gitalk({
+                            id: window.location.pathname, // Ensure uniqueness and length less than 50
+                            clientID: "ce99489e27f66d998fe1",
+                            clientSecret: "fd0bba05f585432aa988cab6c1667a8c5575755f",
+                            repo: "blacktomm.github.io",
+                            owner: "blacktomm",
+                            admin: "blacktomm",
+                            id: location.pathname,
+                            distractionFreeMode: false // Facebook-like distraction free mode
+                        })
+                        gitalk.render('gitalk-container')
+                    </script>
+                    <!-- Gitalk end -->
+                    
+
+
+
+
+                        
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; BlackTom&#39;s Blog 2021 |<a href="http://beian.miit.gov.c" target="_blank">
+                        鄂ICP备20013606号
+                    </a>
+                    <br>
+                    Theme by <a href="http://huangxuan.me" target="_blank" rel="noopener">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks" target="_blank" rel="noopener">Kaijun</a>  
+                    <!-- <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://blacktomm.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-48901276-3';
+    var _gaDomain = 'blacktom.top';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
