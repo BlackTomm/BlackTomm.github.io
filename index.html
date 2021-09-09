@@ -101,14 +101,14 @@
 
                         
                         <li>
-                            <a href="/archives/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archives/">Archives</a>
                         </li>
                         
                     
@@ -193,6 +193,27 @@
 
 <div class="post-preview">
 
+    <a href="/2021/09/03/guaua-cache-guide/">
+        <h2 class="post-title">
+            guaua-cache-guide
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            缓存缓存分为本地缓存和远端缓存。常见的远端缓存有Redis，MongoDB；本地缓存一般使用map的方式保存在本地内存中。一般我们在业务中操作缓存，都会操作缓存和数据源两部分。如：put数据时，先插入DB，再删除原来的缓存；ge数据时，先查缓存，命中则返回，没有命中时，需要查询DB，再把查询结果放入缓存中 。如果访问量大，我们还得兼顾本地缓存的线程安全问题。必要的时候也要考虑缓存的回收策略。......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Black Tom on
+        2021-09-03
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/2021/09/01/spring-ioc-step-01/">
         <h2 class="post-title">
             spring-ioc-step-01
@@ -201,7 +222,7 @@
             
         </h3>
         <div class="post-content-preview">
-            缘起从懵懵懂懂翻开《Spring实战 第四版》的那一刻起，就逐渐开始与后端结缘，奈何配置文件繁杂，一度感觉疲惫，甚至有些怀疑，这就是发展了十几年的框架吗？直到开始使用SpringBoot, 约定优于配置，的却简化了许多不必要的文件，就像maven的发展历程一样。一转眼，Spring框架已经发展到了5.3.9，但看十年前的书籍，却依然适用，从一开始，开发者就确定了其基本骨架。随着使用的时间的越......
+            缘起从懵懵懂懂翻开《Spring实战 第四版》的那一刻起，就逐渐开始与后端结缘，奈何配置文件繁杂，一度感觉疲惫，甚至有些怀疑，发展了十几年的框架实际用的并不得心应手？直到开始使用SpringBoot, 约定优于配置，的确简化了许多不必要的文件，就像maven的发展历程一样。一转眼，Spring框架已经发展到了5.3.9，但看十年前的书籍，却依然适用，从一开始，开发者就确定了其基本骨架。随着使......
         </div>
     </a>
     <p class="post-meta">
@@ -322,6 +343,8 @@ Hexo 依赖于 Node......
                     <!-- no hr -->
                     <h5><a href="/tags/">标签</a></h5>
                     <div class="tags">
+                        
+                            
                         
                             
                         
