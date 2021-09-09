@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <!-- <link rel="shortcut icon" href="/img/favicon.ico"> -->
+    <!-- 自定义图标 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+
+    <title>
+        
+            spring-ioc-step-01 - BlackTom的博客 |  BlackTom&#39;s Blog
+                
+    </title>
+
+    <link rel="canonical" href="https://blacktomm.github.io/2021/09/01/spring-ioc-step-01/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+        <!-- Custom CSS -->
+        
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+            <!-- Pygments Highlight CSS -->
+            
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+                <!-- Custom Fonts -->
+                <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+                <!-- Hux change font-awesome CDN to qiniu -->
+                <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+                <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+                <!-- ga & ba script hoook -->
+                <script></script>
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="BlackTom's Blog" type="application/atom+xml">
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">BlackTom&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header {
+        background-image: url('https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/my-blog/blog-config/back2.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                
+                    <h2>
+                        spring-ioc-step-01
+                    </h2>
+                    <h3 class="subheading">
+                        
+                    </h3>
+                      <div class="tags">
+                        
+                            <a class="tag" href="/tags/#spring-ioc" title="spring-ioc">
+                                spring-ioc
+                            </a>
+                            
+                    </div>
+                    <br>
+                    <span class="meta">
+                        Posted by Black Tom on
+                        2021-09-01
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h2 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h2><p>从懵懵懂懂翻开<a href="https://book.douban.com/subject/26767354/" target="_blank" rel="noopener">《Spring实战 第四版》</a>的那一刻起，就逐渐开始与后端结缘，奈何配置文件繁杂，一度感觉疲惫，甚至有些怀疑，这就是发展了十几年的框架吗？直到开始使用SpringBoot, 约定优于配置，的却简化了许多不必要的文件，就像maven的发展历程一样。一转眼，Spring框架已经发展到了5.3.9，但看十年前的书籍，却依然适用，从一开始，开发者就确定了其基本骨架。随着使用的时间的越长，却越来越迷茫，刚好看到个<a href="https://github.com/fuzhengwei/small-spring" target="_blank" rel="noopener">small-spring</a>项目，一步步搭建的过程开始对整个框架多了一丝理解。</p>
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>Spring框架比较熟悉的两个特性就是控制反转（IOC）与切面(AOP),控制反转是通过将对象的创建、对象的存储、对象的管理交给了Spring容器，从而将创建与使用解耦，减少了同一个类多个实例的创建，当重复的代码越少，维护出错的可能性就越低。切面则是在实例创建的过程中实现的代理，整体功能依旧以底层容器为依托，但框架的设计、解耦从来都不是件简单的事，保持多年稳定更是难上加难。经过多年的发展，Spring的代码已经相当复杂，对于代码实践较少的小白来说，debug也依旧是雾里看花，难窥奥妙，好在有人指路，少了些磕磕绊绊，就写点自己的理解吧。</p>
+<p><img src="https://docs.spring.io/spring-framework/docs/4.3.20.RELEASE/spring-framework-reference/html/images/spring-overview.png" alt="spring overview"></p>
+<p><a href="https://docs.spring.io/spring-framework/docs/4.3.20.RELEASE/spring-framework-reference/html/overview.html" target="_blank" rel="noopener">Spring框架一览</a></p>
+<h2 id="Spring容器究竟是什么？"><a href="#Spring容器究竟是什么？" class="headerlink" title="Spring容器究竟是什么？"></a>Spring容器究竟是什么？</h2><p><strong>原来它只是个Map</strong>，想起编写最基本的类的时候，在一个类中创建字段，赋值的过程就像是一组组键值对。对于一个Map来说，同样可以根据实例名称来获取实例对象，getBean也只是个查询操作。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>    BeanFactory factory = <span class="hljs-keyword">new</span> ClassPathXmlApplicationContext(<span class="hljs-string">"basic_dl/quickstart-byname.xml"</span>);<br>    Person person = (Person) factory.getBean(<span class="hljs-string">"person"</span>);<br>    System.out.println(person);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>当一个简单的对象实例被IOC 容器创建后，下次获取时只需要简单的获取就可以，对于顶层的接口，通常只提供get方法，从而能够有效提升其扩展性。初始时只考虑单例 bean的情况，BeanFactory作为顶层获取 Bean的接口，之所以还会有SingletonBeanRegistry, 一方面是考虑到后续还有非单例情形，另一方面尽量与现有框架一致，其默认实现DefaultSingletonBeanRegistry 内部增加了 HashMap 作为 单例Bean 容器。</p>
+<p><img src="https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/record/2021%20/09/%2007/DefaultListableBeanFactory.png" alt="DefaultListableBeanFactory"></p>
+<h3 id="BeanDefinition"><a href="#BeanDefinition" class="headerlink" title="BeanDefinition"></a>BeanDefinition</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.config;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BeanDefinition</span> </span>&#123;<br><br>	<span class="hljs-keyword">private</span> Class beanClass;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">BeanDefinition</span><span class="hljs-params">(Class beanClass)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.beanClass = beanClass;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Class <span class="hljs-title">getBeanClass</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> beanClass;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setBeanClass</span><span class="hljs-params">(Class beanClass)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.beanClass = beanClass;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>BeanDefinition 包含待传递的实例类，在初始化阶段会进行调用。</p>
+<h3 id="Beanfactory"><a href="#Beanfactory" class="headerlink" title="Beanfactory"></a>Beanfactory</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">BeanFactory</span> </span>&#123;<br>	<span class="hljs-function">Object <span class="hljs-title">getBean</span><span class="hljs-params">(String name)</span> <span class="hljs-keyword">throws</span> BeansException</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Beanfactory对外只提供一个获取 Bean 的接口，至于 bean的注入则是由容器来处理的，通常包括 xml 的解析与注解注入实现。</p>
+<h3 id="SingletonBeanRegistry"><a href="#SingletonBeanRegistry" class="headerlink" title="SingletonBeanRegistry"></a>SingletonBeanRegistry</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.config;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">SingletonBeanRegistry</span> </span>&#123;<br>	<span class="hljs-function">Object <span class="hljs-title">getSingleton</span><span class="hljs-params">(String beanName)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="DefaultSingletonBeanRegistry"><a href="#DefaultSingletonBeanRegistry" class="headerlink" title="DefaultSingletonBeanRegistry"></a>DefaultSingletonBeanRegistry</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.support;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DefaultSingletonBeanRegistry</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">SingletonBeanRegistry</span> </span>&#123;<br><br>	<span class="hljs-keyword">private</span> Map&lt;String, Object&gt; singletonObjects = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getSingleton</span><span class="hljs-params">(String beanName)</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> singletonObjects.get(beanName);<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addSingleton</span><span class="hljs-params">(String beanName, Object singletonObject)</span> </span>&#123;<br>		singletonObjects.put(beanName, singletonObject);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>单例 Bean 的保存由singletonObjects由 Map 来实现，对于 bean 的获取通常借助于 BeanFactory 实现类，在获取时可对单例与非单例情况进行处理。</p>
+<h4 id="AbstractBeanFactory"><a href="#AbstractBeanFactory" class="headerlink" title="AbstractBeanFactory"></a>AbstractBeanFactory</h4><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.support;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractBeanFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">DefaultSingletonBeanRegistry</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">BeanFactory</span> </span>&#123;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getBean</span><span class="hljs-params">(String name)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		Object bean = getSingleton(name);<br>		<span class="hljs-keyword">if</span> (bean != <span class="hljs-keyword">null</span>) &#123;<br>			<span class="hljs-keyword">return</span> bean;<br>		&#125;<br><br>		BeanDefinition beanDefinition = getBeanDefinition(name);<br>		<span class="hljs-keyword">return</span> createBean(name, beanDefinition);<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> BeanDefinition <span class="hljs-title">getBeanDefinition</span><span class="hljs-params">(String beanName)</span> <span class="hljs-keyword">throws</span> BeansException</span>;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> Object <span class="hljs-title">createBean</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition)</span> <span class="hljs-keyword">throws</span> BeansException</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>AbstractBeanFactory主要是对 getBean方法的实现，当获取 Bean 时，优先从单例 Map中查找，当查找不到时，则需要获取 BeanDefinition并注入，其实现交由子类负责。</p>
+<h3 id="AbstractAutowireCapableBeanFactory"><a href="#AbstractAutowireCapableBeanFactory" class="headerlink" title="AbstractAutowireCapableBeanFactory"></a>AbstractAutowireCapableBeanFactory</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.support;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractAutowireCapableBeanFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractBeanFactory</span> </span>&#123;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> Object <span class="hljs-title">createBean</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		Object bean = <span class="hljs-keyword">null</span>;<br>		<span class="hljs-keyword">try</span> &#123;<br>			bean = beanDefinition.getBeanClass().newInstance();<br>		&#125; <span class="hljs-keyword">catch</span> (InstantiationException | IllegalAccessException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br><br>		addSingleton(beanName,bean);<br>		<span class="hljs-keyword">return</span> bean;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里 createBean注入的过程依赖于 BeanDefinition 传入的类名，而后通过反射实现实例的创建，由于单例 Map中不包含该对象，因此需要添加到其中，避免 getBean中再次获取不到而导致重复创建。</p>
+<h3 id="BeanDefinitionRegistry"><a href="#BeanDefinitionRegistry" class="headerlink" title="BeanDefinitionRegistry"></a>BeanDefinitionRegistry</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.support;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">BeanDefinitionRegistry</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">registerBeanDefinition</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="DefaultListableBeanFactory"><a href="#DefaultListableBeanFactory" class="headerlink" title="DefaultListableBeanFactory"></a>DefaultListableBeanFactory</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans.factory.support;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DefaultListableBeanFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractAutowireCapableBeanFactory</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">BeanDefinitionRegistry</span> </span>&#123;<br><br>   <span class="hljs-keyword">private</span> Map&lt;String, BeanDefinition&gt; beanDefinitionMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br><br>   <span class="hljs-meta">@Override</span><br>   <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">registerBeanDefinition</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition)</span> </span>&#123;<br>      beanDefinitionMap.put(beanName, beanDefinition);<br>   &#125;<br><br>   <span class="hljs-meta">@Override</span><br>   <span class="hljs-function"><span class="hljs-keyword">public</span> BeanDefinition <span class="hljs-title">getBeanDefinition</span><span class="hljs-params">(String beanName)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>      BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);<br>      <span class="hljs-keyword">if</span> (beanDefinition == <span class="hljs-keyword">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BeansException(<span class="hljs-string">"No bean named '"</span> + beanName + <span class="hljs-string">"' is defined"</span>);<br>      <span class="hljs-keyword">return</span> beanDefinition;<br>   &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里会将注入的 Bean放入beanDefinitionMap中，作为一层缓存，当单例 Bean 中 Map查找不到时，会通过getBeanDefinition获取 BeanDefinition，并注入单例 Bean 中 Map，相当于 BeanFactory只负责获取，而 BeanDefinition 的注册交由BeanDefinitionRegistry。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>随便自定义一个测试类，如</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework.beans;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">queryUserInfo</span><span class="hljs-params">()</span></span>&#123;<br>		System.out.println(<span class="hljs-string">"查询用户信息"</span>);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>测试类如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.code.springframework;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ApiTest</span> </span>&#123;<br><br>	<span class="hljs-meta">@Test</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test_BeanFactory</span><span class="hljs-params">()</span></span>&#123;<br>		<span class="hljs-comment">// 1.初始化 BeanFactory</span><br>		DefaultListableBeanFactory beanFactory = <span class="hljs-keyword">new</span> DefaultListableBeanFactory();<br><br>		<span class="hljs-comment">// 2.注册 bean</span><br>		BeanDefinition beanDefinition = <span class="hljs-keyword">new</span> BeanDefinition(UserService<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>		beanFactory.registerBeanDefinition(<span class="hljs-string">"userService"</span>, beanDefinition);<br><br>		<span class="hljs-comment">// 3.第一次获取 bean</span><br>		UserService userService = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>);<br>		userService.queryUserInfo();<br>		System.out.println(<span class="hljs-string">"第一次获取："</span> + userService);<br><br>		<span class="hljs-comment">// 4.第二次获取 bean from Singleton</span><br>		UserService userService_singleton = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>);<br>		userService_singleton.queryUserInfo();<br>		System.out.println(<span class="hljs-string">"第二次获取："</span> + userService);<br>	&#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>初始时单例 Bean 中 Map不包含该实例，需要获取 BeanDefinition并注入，因此先注册 BeanDefition，而后调用 getBean 来触发 Bean 注入到 Map 中，debug 可以看到多次获取为同意对象。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/fuzhengwei/small-spring" target="_blank" rel="noopener">Spring 手撸专栏</a></li>
+<li><a href="https://juejin.cn/book/6857911863016390663/section" target="_blank" rel="noopener">从 0 开始深入学习 Spring</a></li>
+</ul>
+
+
+                    <hr>
+
+
+                    
+
+                            <ul class="pager">
+                                
+                                        
+                                            <li class="next">
+                                                <a href="/2021/08/19/operating-system-step-01/" data-toggle="tooltip" data-placement="top" title="手把手搭个操作系统（一）">Next &rarr;</a>
+                                            </li>
+                                            
+                            </ul>
+
+                            
+
+                                    
+
+                                            
+                                                <!-- gitalk 评论框 start -->
+                                                <div class="comment">
+                                                    <div id="gitalk-container"></div>
+                                                </div>
+                                                <!-- gitalk 评论框 end -->
+                                                
+            </div>
+
+            <!-- Side Catalog Container -->
+            
+
+                    <!-- Sidebar Container -->
+
+                    <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                        <!-- Featured Tags -->
+                        
+
+                                <!-- Friends Blog -->
+                                
+                    </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+        
+
+                
+                    <!-- Gitalk start -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+                    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+                    <script>
+                        var gitalk = new Gitalk({
+                            id: window.location.pathname, // Ensure uniqueness and length less than 50
+                            clientID: "ce99489e27f66d998fe1",
+                            clientSecret: "fd0bba05f585432aa988cab6c1667a8c5575755f",
+                            repo: "blacktomm.github.io",
+                            owner: "blacktomm",
+                            admin: "blacktomm",
+                            id: location.pathname,
+                            distractionFreeMode: false // Facebook-like distraction free mode
+                        })
+                        gitalk.render('gitalk-container')
+                    </script>
+                    <!-- Gitalk end -->
+                    
+
+
+
+
+                        
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; BlackTom&#39;s Blog 2021 |<a href="http://beian.miit.gov.c" target="_blank">
+                        鄂ICP备20013606号
+                    </a>
+                    <br>
+                    Theme by <a href="http://huangxuan.me" target="_blank" rel="noopener">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks" target="_blank" rel="noopener">Kaijun</a>  
+                    <!-- <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://blacktomm.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-48901276-3';
+    var _gaDomain = 'blacktom.top';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
