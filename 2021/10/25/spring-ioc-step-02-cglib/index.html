@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <!-- <link rel="shortcut icon" href="/img/favicon.ico"> -->
+    <!-- 自定义图标 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+
+    <title>
+        
+            spring-ioc-step-02-cglib - BlackTom的博客 |  BlackTom&#39;s Blog
+                
+    </title>
+
+    <link rel="canonical" href="https://blacktomm.github.io/2021/10/25/spring-ioc-step-02-cglib/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+        <!-- Custom CSS -->
+        
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+            <!-- Pygments Highlight CSS -->
+            
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+                <!-- Custom Fonts -->
+                <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+                <!-- Hux change font-awesome CDN to qiniu -->
+                <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+                <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+                <!-- ga & ba script hoook -->
+                <script></script>
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="BlackTom's Blog" type="application/atom+xml">
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">BlackTom&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header {
+        background-image: url('https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/my-blog/blog-config/back2.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                
+                    <h2>
+                        spring-ioc-step-02-cglib
+                    </h2>
+                    <h3 class="subheading">
+                        
+                    </h3>
+                      <div class="tags">
+                        
+                    </div>
+                    <br>
+                    <span class="meta">
+                        Posted by Black Tom on
+                        2021-10-25
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h2 id="Cglib"><a href="#Cglib" class="headerlink" title="Cglib"></a>Cglib</h2><p>cglib库的Enhancer在Spring AOP中作为一种生成代理的方式被广泛使用，它是一个字节码增强器，可以用来为无接口的类创建代理。它的功能与java自带的Proxy类挺相似的。它会根据某个给定的类创建子类，并且所有非final的方法都带有回调钩子。</p>
+<h3 id="Enhancer类"><a href="#Enhancer类" class="headerlink" title="Enhancer类"></a>Enhancer类</h3><p>在CGLIB库中，<code>net.sf.cglib.proxy</code>包下面的类主要负责实现动态代理。其中，<strong>Enhancer</strong> 类是CGLIB实现动态代理的核心类。<strong>Enhancer</strong> 类通过创建被代理类的子类来实现动态代理。不同于JDK 1.3中基于接口实现的动态代理，CGLIB通过继承的方式实现动态代理，除此之外，CGLIB也支持基于接口的动态代理。相对JDK自带的Proxy动态代理，CGLIB提供的能力更加强大。</p>
+<p>下面来看一个通过Enhancer类创建动态代理的例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Foo.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// Main.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        <span class="hljs-comment">// 设置被代理的类对象</span><br>        enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>        enhancer.setCallback(<span class="hljs-keyword">new</span> CallbackImpl());<br>        Foo fooProxy = (Foo) enhancer.create();<br>        fooProxy.setName(<span class="hljs-string">"name"</span>);<br>        System.out.println(fooProxy.getName());<br><br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName());<br>            <span class="hljs-keyword">return</span> proxy.invokeSuper(obj, args);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-built_in">int</span>ercept: setName<br><span class="hljs-built_in">int</span>ercept: getName<br>name<br></code></pre></td></tr></table></figure>
+
+<p>上面的例子中，我们使用<strong>Enhancer</strong> 类的<code>enhancer.setSuperClass(Foo.class)</code>方法设置需要被代理的类，然后我们需要设置一个回调对象 <strong>Callback</strong> ，如果你熟悉JDK的Proxy代理实现的话，就会发现这个回调对象和 <strong>InvocationHandler</strong> 比较类似，确实这里的 <strong>Callback</strong> 对象做的作用和 <strong>InvocationHandler</strong> 是一样的，提供代理的逻辑。这里我们使用 <strong>MethodInterceptor</strong> 这个Callback实现类。CGLIB提供了一些不同的Callback实现，在后面我们会一一介绍，这里只要知道我们采用的是 <strong>MethodInterceptor</strong>。</p>
+<p><strong>MethodInterceptor</strong> 接口中定义了一个<code>intercept(Object obj, Method method, Object[] args, MethodProxy proxy)</code>方法，我们可以通过实现这个方法来做具体的代理逻辑。<code>intercept</code>方法的第一个参数<code>obj</code>是创建的代理对象；<code>method</code>是被调用的具体的方法对象；<code>args</code>是方法调用的参数列表；<code>proxy</code>这个对象是对前面<code>method</code>方法的封装，可以通过<code>invokeSuper()</code>方便得调用父类（也就是我们要代理的类）的方法。</p>
+<p><strong>Enhancer</strong> 类也提供了用于创建动态代理类的静态方法，比如上面例子中创建动态代理类的写法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java">Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>enhancer.setCallback(<span class="hljs-keyword">new</span> CallbackImpl());<br>Foo fooProxy = (Foo) enhancer.create();<br></code></pre></td></tr></table></figure>
+
+<p>可以用<code>public static Object create(Class type, Callback callback)</code>静态方法代替：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java">Foo fooProxy = (Foo) Enhancer.create(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">new</span> <span class="hljs-title">CallbackImpl</span>())</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="基于接口的动态代理"><a href="#基于接口的动态代理" class="headerlink" title="基于接口的动态代理"></a>基于接口的动态代理</h3><p>CGLIB的动态代理是基于继承来实现的，但是CGLIB也支持通过接口的方式来实现动态代理。CGLIB的 <strong>Ehancer</strong> 类提供了 <code>setInterfaces(Class[] interfaces)</code>方法，可以设置需要被代理的类实现的接口，通过这种方式，达到和JDK中Proxy一样的效果。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// FooInterface.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">FooInterface</span> </span>&#123;<br>     <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span></span>;<br>     <span class="hljs-function">String <span class="hljs-title">getName</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-comment">// Foo.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">FooInterface</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// Main.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        <span class="hljs-comment">// 设置代理接口</span><br>        enhancer.setInterfaces(<span class="hljs-keyword">new</span> Class[] &#123;FooInterface<span class="hljs-class">.<span class="hljs-keyword">class</span>&#125;)</span>;<br>        enhancer.setCallback(<span class="hljs-keyword">new</span> CallbackImpl());<br>        FooInterface fooProxy = (FooInterface) enhancer.create();<br>        fooProxy.setName(<span class="hljs-string">"name"</span>);<br>        System.out.println(fooProxy.getName());<br><br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> FooInterface foo = <span class="hljs-keyword">new</span> Foo();<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName());<br>            <span class="hljs-keyword">return</span> method.invoke(foo, args);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-built_in">int</span>ercept: setName<br><span class="hljs-built_in">int</span>ercept: getName<br>name<br></code></pre></td></tr></table></figure>
+
+<p>通过 <strong>Enhancer</strong> 类的<code>setInterfaces()</code>方法，可以设置需要被代理的接口。如果你了解 JDK 1.3中的动态代理的话，可以发现在 <strong>CallbackImpl</strong> 中调用method的方式，和 <strong>InvocationHandler</strong> 是一样。特别的，CGLIB还提供了一个特殊的 <strong>Callback</strong> 类型<code>net.sf.cglib.proxy.InvocationHandler</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> java.lang.reflect.InvocationHandler&#125; replacement (unavailable under JDK 1.2).</span><br><span class="hljs-comment"> * This callback type is primarily for use by the &#123;<span class="hljs-doctag">@link</span> Proxy&#125; class but</span><br><span class="hljs-comment"> * may be used with &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; as well.</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Neeme Praks &lt;a href="mailto:neeme@apache.org"&gt;neeme@apache.org&lt;/a&gt;</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@version</span> $Id: InvocationHandler.java,v 1.3 2004/06/24 21:15:20 herbyderby Exp $</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">InvocationHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@see</span> java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object)</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] args)</span> <span class="hljs-keyword">throws</span> Throwable</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以发现，CGLIB中的 <code>net.sf.cglib.proxy.InvocationHandler</code> 接口和 JDK 1.3中定义的 <code>java.lang.reflect.InvocationHandler</code> 定义的一样，也包含三个参数：<code>object</code>、<code>method</code>和<code>args</code>。同样的，在CGLIB包中的 <code>java.lang.reflect.InvocationHandler.invoke()</code> 方法中定义的这三个参数和JDK中定义的含义是一样的。上面的 <strong>CallbackImpl</strong> 实现如果替换成 <code>java.lang.reflect.InvocationHandler</code>，可以实现类似JDK 1.3的写法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>  ....<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">InvocationHandler</span> </span>&#123;<br>      <span class="hljs-keyword">private</span> FooInterface foo = <span class="hljs-keyword">new</span> Foo();<br><br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] args)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>          System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName());<br>          <span class="hljs-keyword">return</span> method.invoke(foo, args);<br>      &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="组合接口实现和子类继承"><a href="#组合接口实现和子类继承" class="headerlink" title="组合接口实现和子类继承"></a>组合接口实现和子类继承</h3><p>CGLIB的 <strong>Enhancer</strong> 类支持同时通过接口实现和继承的方式创建动态代理。也就是说，我们在创建动态代理的时候，可以同时设置 <strong>Enhancer</strong> 类的 <code>setSuperClass()</code>方法和 <code>setInterfaces()</code>方法。这种方式类似于Java中的类继承机制，可以同时处理接口实现和类继承。</p>
+<p>我们来看一个例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// FooInterface.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">FooInterface</span> </span>&#123;<br>     <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span></span>;<br>     <span class="hljs-function">String <span class="hljs-title">getName</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-comment">// Foo.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">FooInterface</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">"foo"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        <br>        enhancer.setInterfaces(<span class="hljs-keyword">new</span> Class[] &#123;FooInterface<span class="hljs-class">.<span class="hljs-keyword">class</span>&#125;)</span>;<br>        enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>        <br>        enhancer.setCallback(<span class="hljs-keyword">new</span> CallbackImpl());<br>        <br>        Foo fooProxy = (Foo) enhancer.create();<br>        fooProxy.setName(<span class="hljs-string">"name"</span>);<br>        System.out.println(fooProxy.getName());<br>        fooProxy.foo();<br><br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> FooInterface foo = <span class="hljs-keyword">new</span> Foo();<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object proxy, Method method, Object[] args, MethodProxy methodProxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName());<br>            <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"getName"</span>)) &#123;<br>                <span class="hljs-keyword">return</span> methodProxy.invoke(foo, args);<br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"setName"</span>)) &#123;<br>                <span class="hljs-keyword">return</span> methodProxy.invokeSuper(proxy, args);<br>            &#125;<br>            <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> methodProxy.invoke(foo, args);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">intercept:</span> <span class="hljs-string">setName</span><br><span class="hljs-attr">intercept:</span> <span class="hljs-string">getName</span><br><span class="hljs-literal">null</span><br><span class="hljs-attr">intercept:</span> <span class="hljs-string">foo</span><br><span class="hljs-string">foo</span><br></code></pre></td></tr></table></figure>
+
+<p>上面的例子中，我们既通过<code>setSuperClass(Foo.class)</code>设置了动态代理类的父类是 <strong>Foo</strong> ，同时又通过<code>setInterfaces(new Class[] {FooInterface.class})</code>设置了动态代理类实现的接口。我们在Callback的实现中，调用<code>setName()</code>方法的时候，使用的是内部的foo对象，而<code>getName()</code>的时候调用的的是<code>methodProxy.invokeSuper()</code>，因为调用的不是同一个对象，所以<code>getName()</code>获取的值是null。</p>
+<p>这个例子中，我们使用了<code>methodProxy.invoke()</code>方法，而不是上面 <strong>InvocationHandler</strong> 例子中的<code>method.invoke()</code>，<strong>InvocationHandler</strong> 中的<code>method.invoke()</code>是运用反射的方式来实现方法调用的，而CGLIB的<code>methodProxy.invoke()</code>是通过另外的FastClass的方式实现的，具体的细节由于篇幅限制，不在这里展开。</p>
+<p>同样的，Enhancer类也提供了一个静态方法来简化创建动态代理的过程。</p>
+<figure class="highlight delphi"><table><tr><td class="code"><pre><code class="hljs delphi"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">Object</span> create(<span class="hljs-keyword">Class</span> superclass, <span class="hljs-keyword">Class</span>[] interfaces, Callback callback);<br></code></pre></td></tr></table></figure>
+
+<h3 id="多个Callback对象"><a href="#多个Callback对象" class="headerlink" title="多个Callback对象"></a>多个Callback对象</h3><p>CGLIB支持同时定义多个 <strong>Callback</strong> 对象。<strong>Enhancer</strong> 类的<code>create</code>方法可以传递一个 <strong>Callback</strong> 数组，当指定多个 <strong>Callback</strong> 对象的时候，需要通过 <strong>CallbackFilter</strong> 类来分派不同的方法到不同的 <strong>Callback</strong> 对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">CallbackFilter</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Map a method to a callback.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> method the intercepted method</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the index into the array of callbacks (as specified by &#123;<span class="hljs-doctag">@link</span> Enhancer#setCallbacks&#125;) to use for the method, </span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">accept</span><span class="hljs-params">(Method method)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * The &lt;code&gt;CallbackFilter&lt;/code&gt; in use affects which cached class</span><br><span class="hljs-comment">     * the &lt;code&gt;Enhancer&lt;/code&gt; will use, so this is a reminder that</span><br><span class="hljs-comment">     * you should correctly implement &lt;code&gt;equals&lt;/code&gt; and</span><br><span class="hljs-comment">     * &lt;code&gt;hashCode&lt;/code&gt; for custom &lt;code&gt;CallbackFilter&lt;/code&gt;</span><br><span class="hljs-comment">     * implementations in order to improve performance.</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">equals</span><span class="hljs-params">(Object o)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>CGLIB提供了一个Callback对象过滤器：<strong>CallbackFilter</strong> ，该类提供了一个<code>accept()</code>方法，该方法返回的是提供的 <strong>Callback</strong> 数组的下标。通过 <strong>CallbackFilter</strong> 可以将拦截的请求分派到不同的 <strong>Callback</strong> 对象中。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Foo.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// Main.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>        enhancer.setCallbacks(<span class="hljs-keyword">new</span> Callback[] &#123;<span class="hljs-keyword">new</span> CallbackImpl1(), <span class="hljs-keyword">new</span> CallbackImpl2()&#125;);<br>        enhancer.setCallbackFilter(<span class="hljs-keyword">new</span> CallbackFilterImpl());<br>        Foo fooProxy = (Foo) enhancer.create();<br>        fooProxy.setName(<span class="hljs-string">"name"</span>);<br>        System.out.println(fooProxy.getName());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackFilterImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">CallbackFilter</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">accept</span><span class="hljs-params">(Method method)</span> </span>&#123;<br>            <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"setName"</span>)) &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl1</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object proxy, Method method, Object[] args, MethodProxy methodProxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> methodProxy.invokeSuper(proxy, args);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl2</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> proxy.invokeSuper(obj, args);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在上面的例子中，我们用 <strong>CallbackFilterImpl</strong> 实现了一个Callback的过滤器，通过返回Callback对象的下标将拦截到的请求分派到不同的Callback实现类： <strong>CallbackImpl1</strong> 和 <strong>CallbackImpl2</strong> 中。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title">create</span><span class="hljs-params">(Class superclass, Class[] interfaces, CallbackFilter filter, Callback[] callbacks)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>CGLIB也提供了一个静态方法来创建支持Callback对象拦截器的动态代理对象。</p>
+<h3 id="动态代理Class对象"><a href="#动态代理Class对象" class="headerlink" title="动态代理Class对象"></a>动态代理Class对象</h3><p>上面我们了解了如何通过 <strong>Enhancer</strong> 创建一个动态代理对象。有时候，我们处于性能或者延迟创建动态代理对象的考虑，我们需要创建一个动态代理类对象，然后将这个类对象缓存起来，等到需要的时候再通过这个类对象创建需要的动态代理类。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Foo.java</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>        enhancer.setCallbackTypes(<span class="hljs-keyword">new</span> Class[] &#123;CallbackImpl1<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">CallbackImpl2</span>.<span class="hljs-title">class</span>&#125;)</span>;<br>        enhancer.setCallbackFilter(<span class="hljs-keyword">new</span> CallbackFilterImpl());<br><br>        Class clazz = enhancer.createClass();<br>        Enhancer.registerCallbacks(clazz, <span class="hljs-keyword">new</span> Callback[] &#123;<span class="hljs-keyword">new</span> CallbackImpl1(), <span class="hljs-keyword">new</span> CallbackImpl2()&#125;);<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            Foo fooProxy = (Foo) clazz.newInstance();<br>            fooProxy.setName(<span class="hljs-string">"name"</span>);<br>            System.out.println(fooProxy.getName());<br>        &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException | InstantiationException ignore) &#123;<br><br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackFilterImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">CallbackFilter</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">accept</span><span class="hljs-params">(Method method)</span> </span>&#123;<br>            <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"setName"</span>)) &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl1</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object proxy, Method method, Object[] args, MethodProxy methodProxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> methodProxy.invokeSuper(proxy, args);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl2</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> proxy.invokeSuper(obj, args);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight stylus"><table><tr><td class="code"><pre><code class="hljs stylus">intercept: setName <span class="hljs-keyword">in</span>: org<span class="hljs-selector-class">.learn</span><span class="hljs-selector-class">.agent</span>.Foo<span class="hljs-variable">$CallbackImpl1</span><br>intercept: getName <span class="hljs-keyword">in</span>: org<span class="hljs-selector-class">.learn</span><span class="hljs-selector-class">.agent</span>.Foo<span class="hljs-variable">$CallbackImpl2</span><br>name<br></code></pre></td></tr></table></figure>
+
+<p>我们首先通过<code>Enhancer enhancer = new Enhancer()</code>创建一个Enhancer对象，然后和之前一样，我们对这个enhancer对象调用<code>enhancer.setSuperClass()</code>来设置需要被代理的类对象。然后通过<code>enhancer.setCallbackTypes()</code>设置所有拦截器的类型。这里我们设置了多个拦截器Callback，所以需要通过<code>enhancer.setCallbackFilter()</code>设置一个拦截器过滤器CallbackFilter来处理拦截请求的分派。如果设置的拦截器只有一个，那设置过滤器的这一步可以省略。然后我们通过调用<code>enhancer.createClass()</code>创建一个代理类的类对象。创建完类对象以后，我们还需要把拦截器对象通过<code>registerCallbacks()</code>注册到这个动态代理类对象上面。然后我们通过反射的方式，用这个动态代理类对象创建了一个动态代理对象。</p>
+<p>需要注意的一点是，我们在上面的代码中，通过<code>registerCallbacks()</code>注册到动态代理类对象的拦截器，只会影响到注册这些拦截器的线程，如果这个动态代理类对象被别的线程使用，那么这些拦截器不会起作用。不过 <strong>Enhancer</strong> 类提供了另外一个方法<code>registerStaticCallbacks()</code>，这个方式注册的拦截器可以被所有线程共享。</p>
+<h3 id="CallbackHelper"><a href="#CallbackHelper" class="headerlink" title="CallbackHelper"></a>CallbackHelper</h3><p>当我们的拦截器 <strong>Callback</strong> 对象有多个的时候，我们创建一个 <strong>CallbackFilter</strong> 对象来处理拦截请求的分派。我们上面的例子中， <strong>CallbackFilterImpl</strong> 的实现中通过设置上下文中定义的拦截器 <strong>Callback</strong> 数组的下标来确定不同的拦截器对象。这种方式既容易出错，也比较繁琐。CGLIB提供了一个 <strong>CallbackHelper</strong> 帮助对象，它其实一个实现了 <strong>CallbackFilter</strong> 接口的抽象类型，使用者只要继承这个抽象类，然后实现 <code>getCallback(Method)</code>方法，通过入参提供的每个需要被拦截的方法，提供不同的Callback对象。利用这个方法，可以获取到所有需要使用到的拦截器，然后可以通过<code>getCallbacks()</code>获取所有的拦截器对象，也可以通过<code>getCallbackTypes()</code>获取到所有拦截器的类型，可以很方便得给Enhancer对象提供需要的参数，而对拦截器的定义统一放在这个帮助类中。</p>
+<p>上面的多拦截器的例子，可以用 <strong>CallbackHelper</strong> 实现同样的功能。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        CallbackHelper callbackHelper = <span class="hljs-keyword">new</span> CallbackHelperImpl(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">null</span>)</span>;<br>        <br>        Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>        enhancer.setSuperclass(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>        enhancer.setCallbackTypes(callbackHelper.getCallbackTypes());<br>        enhancer.setCallbackFilter(callbackHelper);<br><br>        Class clazz = enhancer.createClass();<br>        Enhancer.registerCallbacks(clazz, callbackHelper.getCallbacks());<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            Foo fooProxy = (Foo) clazz.newInstance();<br>            fooProxy.setName(<span class="hljs-string">"name"</span>);<br>            System.out.println(fooProxy.getName());<br>        &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException | InstantiationException ignore) &#123;<br><br>        &#125;<br>    &#125;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackHelperImpl</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">CallbackHelper</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">CallbackHelperImpl</span><span class="hljs-params">(Class superclass, Class[] interfaces)</span> </span>&#123;<br>            <span class="hljs-keyword">super</span>(superclass, interfaces);<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> Object <span class="hljs-title">getCallback</span><span class="hljs-params">(Method method)</span> </span>&#123;<br>            <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"setName"</span>)) &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> CallbackImpl1();<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> CallbackImpl2();<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl1</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object proxy, Method method, Object[] args, MethodProxy methodProxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> methodProxy.invokeSuper(proxy, args);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CallbackImpl2</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MethodInterceptor</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>            System.out.println(<span class="hljs-string">"intercept: "</span> + method.getName() + <span class="hljs-string">" in: "</span> + getClass().getName());<br>            <span class="hljs-keyword">return</span> proxy.invokeSuper(obj, args);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Callback类型"><a href="#Callback类型" class="headerlink" title="Callback类型"></a>Callback类型</h2><p>除了我们上面介绍的 <strong>MethodInterceptor</strong> 和 <strong>InvocationHandler</strong> 这两种类型的拦截器，CGLIB还提供了一些其他类型的拦截器，可以用于特定的场景。</p>
+<h3 id="MethodInterceptor"><a href="#MethodInterceptor" class="headerlink" title="MethodInterceptor"></a>MethodInterceptor</h3><p><strong>MethodInterceptor</strong> 是我们在上文介绍中使用的拦截器，这个拦截器是CGLIB中最通用的拦截器类型，它的作用比较简单，就是拦截方法调用，可以用于实现在AOP中的环绕增强方式。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * General-purpose &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback which provides for "around advice".</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Juozas Baliuka &lt;a href="mailto:baliuka@mwm.lt"&gt;baliuka@mwm.lt&lt;/a&gt;</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@version</span> $Id: MethodInterceptor.java,v 1.8 2004/06/24 21:15:20 herbyderby Exp $</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">MethodInterceptor</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * All generated proxied methods call this method instead of the original method.</span><br><span class="hljs-comment">     * The original method may either be invoked by normal reflection using the Method object,</span><br><span class="hljs-comment">     * or by using the MethodProxy (faster).</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> obj "this", the enhanced object</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> method intercepted Method</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> args argument array; primitive types are wrapped</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> proxy used to invoke super (non-intercepted method); may be called</span><br><span class="hljs-comment">     * as many times as needed</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> Throwable any exception may be thrown; if so, super method will not be invoked</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> any value compatible with the signature of the proxied method. Method returning void will ignore this value.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@see</span> MethodProxy</span><br><span class="hljs-comment">     */</span>    <br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">intercept</span><span class="hljs-params">(Object obj, java.lang.reflect.Method method, Object[] args,</span></span><br><span class="hljs-function"><span class="hljs-params">                               MethodProxy proxy)</span> <span class="hljs-keyword">throws</span> Throwable</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这个拦截器的使用我们在上文中已经介绍了很多了，这里就不再单独介绍了。</p>
+<h3 id="InvocationHandler"><a href="#InvocationHandler" class="headerlink" title="InvocationHandler"></a>InvocationHandler</h3><p><strong>InvocationHandler</strong> 拦截器的作用和上面的 <strong>MethodInterceptor</strong> 一样，是一个通用的方法拦截器。唯一的不同是，这个拦截器类型是对JDK的动态代理实现 <strong>InvocationHandler</strong> 的替换，JDK的动态代理可以选择使用CGLIB中的这个 <strong>InvocationHandler</strong> 拦截器类型，也可以在Enhancer类中使用这个拦截器，实现和Proxy一样的功能。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> java.lang.reflect.InvocationHandler&#125; replacement (unavailable under JDK 1.2).</span><br><span class="hljs-comment"> * This callback type is primarily for use by the &#123;<span class="hljs-doctag">@link</span> Proxy&#125; class but</span><br><span class="hljs-comment"> * may be used with &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; as well.</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Neeme Praks &lt;a href="mailto:neeme@apache.org"&gt;neeme@apache.org&lt;/a&gt;</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@version</span> $Id: InvocationHandler.java,v 1.3 2004/06/24 21:15:20 herbyderby Exp $</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">InvocationHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@see</span> java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object)</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] args)</span> <span class="hljs-keyword">throws</span> Throwable</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="FixedValue"><a href="#FixedValue" class="headerlink" title="FixedValue"></a>FixedValue</h3><p><strong>FixedValue</strong> 这个拦截器类型和它命名含义一样，会对所有的方法调用返回一个固定的值。这个拦截器只有一个<code>loadObject()</code>方法，在实现这个拦截器的时候，需要返回和被拦截的方法的返回值类型相兼容的类型。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback that simply returns the value to return</span><br><span class="hljs-comment"> * from the proxied method. No information about what method</span><br><span class="hljs-comment"> * is being called is available to the callback, and the type of</span><br><span class="hljs-comment"> * the returned object must be compatible with the return type of</span><br><span class="hljs-comment"> * the proxied method. This makes this callback primarily useful</span><br><span class="hljs-comment"> * for forcing a particular method (through the use of a &#123;<span class="hljs-doctag">@link</span> CallbackFilter&#125;</span><br><span class="hljs-comment"> * to return a fixed value with little overhead.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">FixedValue</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Return the object which the original method invocation should</span><br><span class="hljs-comment">     * return. This method is called for &lt;b&gt;every&lt;/b&gt; method invocation.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an object matching the type of the return value for every</span><br><span class="hljs-comment">     * method this callback is mapped to</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>FixedValue</strong> 拦截器使用也比较简单：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Foo fooProxy = (Foo) Enhancer.create(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">new</span> <span class="hljs-title">FixedValueImpl</span>())</span>;<br>        fooProxy.setName(<span class="hljs-string">"new name"</span>);<br>        System.out.println(fooProxy.getName());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FixedValueImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">FixedValue</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-string">"default"</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight haskell"><table><tr><td class="code"><pre><code class="hljs haskell"><span class="hljs-keyword">default</span><br></code></pre></td></tr></table></figure>
+
+<p>可以看到，调用<code>fooProxy.getName()</code>的时候，由于 <strong>FixedValue</strong> 的作用，原先通过<code>setName</code>设置的值被覆盖了。</p>
+<h3 id="LazyLoader"><a href="#LazyLoader" class="headerlink" title="LazyLoader"></a>LazyLoader</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Lazy-loading &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">LazyLoader</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Return the object which the original method invocation should be</span><br><span class="hljs-comment">     * dispatched. Called as soon as the first lazily-loaded method in</span><br><span class="hljs-comment">     * the enhanced instance is invoked. The same object is then used</span><br><span class="hljs-comment">     * for every future method call to the proxy instance.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an object that can invoke the method</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>LazyLoader</strong> 这个Callback的作用是实现延迟加载，<code>LazyLoader</code>接口中只包含了一个<code>loadObject()</code>方法，当第一次调用设置了这个拦截器的动态代理对象的时候，CGLIB会调用这个<code>loadObject()</code>方法获取方法调用实际需要被分派的对象，之后所有拦截到的方法调用都会分派给这个返回的对象。也就是说<code>loadObject()</code>方法只会被调用一次，后续所有的请求都会分派给这个返回的对象。</p>
+<p><strong>LazyLoader</strong> 不同于前面介绍的 <strong>MethodInterceptor</strong> ，在 <strong>MethodInterceptor</strong> 中处理的是方法调用的分派细节，可以控制调用实际对象的前后逻辑，而 <strong>LazyLoader</strong> 关注的是实际方法调用被分派的对象，不关心方法调用前后的控制。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Foo fooProxy = (Foo) Enhancer.create(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">new</span> <span class="hljs-title">LazyLoaderImpl</span>())</span>;<br>        fooProxy.setName(<span class="hljs-string">"new name 1"</span>);<br>        fooProxy.setName(<span class="hljs-string">"new name 2"</span>);<br>        System.out.println(fooProxy.getName());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LazyLoaderImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">LazyLoader</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>            System.out.println(<span class="hljs-string">"lazy load object"</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Foo();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><code class="hljs pgsql">lazy <span class="hljs-keyword">load</span> <span class="hljs-keyword">object</span><br><span class="hljs-built_in">new</span> <span class="hljs-type">name</span> <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<p>从结果中我们也可以看到，虽然我们调用了两次<code>fooProxy.setName()</code>，但是实际<code>LazyLoader.loadObject()</code>只执行了一次。<code>loadObject()</code>的返回值被CGLIB缓存了起来，下次所有拦截到的方法都分派给了这个对象。</p>
+<h3 id="Dispatcher"><a href="#Dispatcher" class="headerlink" title="Dispatcher"></a>Dispatcher</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Dispatching &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback. This is identical to the</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> LazyLoader&#125; interface but needs to be separate so that &lt;code&gt;Enhancer&lt;/code&gt;</span><br><span class="hljs-comment"> * knows which type of code to generate.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Dispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Return the object which the original method invocation should</span><br><span class="hljs-comment">     * be dispatched. This method is called for &lt;b&gt;every&lt;/b&gt; method invocation.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an object that can invoke the method</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>Dispatcher</strong> 和 <strong>LazyLoader</strong> 类似，接口中只有一个<code>loadObject()</code>方法，唯一的区别是：每次方法调用， <strong>Dispatcher</strong> 的<code>loadObject()</code>方法都会执行，并且返回一个新的对象，而 <strong>LazyLoader</strong> 只会执行一次<code>loadObject()</code>方法。</p>
+<p><strong>Dispatcher</strong> 可以用于请求的分派，实现类似于OO里面多态的特性，但是可以控制并决定实际分派的目标对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String ...args)</span> </span>&#123;<br>        Foo fooProxy = (Foo) Enhancer.create(Foo<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">new</span> <span class="hljs-title">DispatcherImpl</span>())</span>;<br>        fooProxy.setName(<span class="hljs-string">"new name 1"</span>);<br>        fooProxy.setName(<span class="hljs-string">"new name 2"</span>);<br>        System.out.println(fooProxy.getName());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DispatcherImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Dispatcher</span> </span>&#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">loadObject</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>            System.out.println(<span class="hljs-string">"dispatch"</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Foo();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="code"><pre><code class="hljs livecodeserver"><span class="hljs-built_in">dispatch</span><br><span class="hljs-built_in">dispatch</span><br><span class="hljs-built_in">dispatch</span><br><span class="hljs-literal">null</span><br></code></pre></td></tr></table></figure>
+
+<p>可以看到，对代理对象的每次方法调用都会执行<code>Dispatcher.loadObject()</code>方法，而且从输出中可以看到，由于每次调用都是作用于新的对象，所以最后一次的<code>getName()</code>调用和之前的<code>setName()</code>调用分派的是不同的对象，导致最后输出的结果数<code>null</code>。</p>
+<h3 id="ProxyRefDispatcher"><a href="#ProxyRefDispatcher" class="headerlink" title="ProxyRefDispatcher"></a>ProxyRefDispatcher</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Dispatching &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback. This is the same as the</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> Dispatcher&#125; except for the addition of an argument</span><br><span class="hljs-comment"> * which references the proxy object.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">ProxyRefDispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Return the object which the original method invocation should</span><br><span class="hljs-comment">     * be dispatched. This method is called for &lt;b&gt;every&lt;/b&gt; method invocation.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> proxy a reference to the proxy (generated) object</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an object that can invoke the method</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">Object <span class="hljs-title">loadObject</span><span class="hljs-params">(Object proxy)</span> <span class="hljs-keyword">throws</span> Exception</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>ProxyRefDispatcher</strong> 这个拦截器类型实现的功能和 <strong>Dispatcher</strong> 类似，也是用于方法调用的分派。但是 <strong>ProxyRefDispatcher</strong> 这个拦截器类型定义了一个带参数的<code>loadObject()</code>方法，方法中的<code>proxy</code>参数是对代理对象的引用。</p>
+<h3 id="NoOp"><a href="#NoOp" class="headerlink" title="NoOp"></a>NoOp</h3><p>这个拦截器类型和它的名字一样，什么也不做。所有的请求都会直接分派给被代理的对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Methods using this &#123;<span class="hljs-doctag">@link</span> Enhancer&#125; callback will delegate directly to the</span><br><span class="hljs-comment"> * default (super) implementation in the base class.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">NoOp</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Callback</span></span><br><span class="hljs-class"></span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * A thread-safe singleton instance of the &lt;code&gt;NoOp&lt;/code&gt; callback.</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> NoOp INSTANCE = <span class="hljs-keyword">new</span> NoOp() &#123; &#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文介绍了如何利用CGLIB的<code>net.sf.cglib.proxy</code>包实现动态代理，介绍了Enhancer类和API的使用，最后对所有Callback类型的功能和特性逐个进行了介绍。动态代理只是CGLIB这个工具包提供了其中一项功能，除了本文介绍的动态代理，它还可以处理Bean对象和实现反射，下次我们介绍下如何利用CGLIB进行反射。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://www.baeldung.com/cglib" target="_blank" rel="noopener">Introduction to cglib</a></li>
+<li><a href="https://www.jianshu.com/p/20203286ccd9" target="_blank" rel="noopener">cglib demo以及Enhancer源码解析</a></li>
+<li><a href="https://www.runoob.com/w3cnote/cglibcode-generation-library-intro.html" target="_blank" rel="noopener">CGLIB(Code Generation Library) 介绍与原理</a></li>
+<li><a href="https://tech101.cn/2019/04/20/%E4%BD%BF%E7%94%A8CGLIB_%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86" target="_blank" rel="noopener">使用CGLIB--动态代理</a></li>
+</ul>
+
+
+                    <hr>
+
+
+                    
+
+                            <ul class="pager">
+                                
+                                        
+                                            <li class="next">
+                                                <a href="/2021/09/09/spring-ioc-step-02-reflection/" data-toggle="tooltip" data-placement="top" title="spring-ioc-step-reflection">Next &rarr;</a>
+                                            </li>
+                                            
+                            </ul>
+
+                            
+
+                                    
+
+                                            
+                                                <!-- gitalk 评论框 start -->
+                                                <div class="comment">
+                                                    <div id="gitalk-container"></div>
+                                                </div>
+                                                <!-- gitalk 评论框 end -->
+                                                
+            </div>
+
+            <!-- Side Catalog Container -->
+            
+
+                    <!-- Sidebar Container -->
+
+                    <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                        <!-- Featured Tags -->
+                        
+
+                                <!-- Friends Blog -->
+                                
+                    </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+        
+
+                
+                    <!-- Gitalk start -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+                    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+                    <script>
+                        var gitalk = new Gitalk({
+                            id: window.location.pathname, // Ensure uniqueness and length less than 50
+                            clientID: "ce99489e27f66d998fe1",
+                            clientSecret: "fd0bba05f585432aa988cab6c1667a8c5575755f",
+                            repo: "blacktomm.github.io",
+                            owner: "blacktomm",
+                            admin: "blacktomm",
+                            id: location.pathname,
+                            distractionFreeMode: false // Facebook-like distraction free mode
+                        })
+                        gitalk.render('gitalk-container')
+                    </script>
+                    <!-- Gitalk end -->
+                    
+
+
+
+
+                        
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; BlackTom&#39;s Blog 2021 |<a href="http://beian.miit.gov.c" target="_blank">
+                        鄂ICP备20013606号
+                    </a>
+                    <br>
+                    Theme by <a href="http://huangxuan.me" target="_blank" rel="noopener">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks" target="_blank" rel="noopener">Kaijun</a>  
+                    <!-- <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://blacktomm.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-48901276-3';
+    var _gaDomain = 'blacktom.top';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
