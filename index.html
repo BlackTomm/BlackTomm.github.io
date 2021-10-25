@@ -101,6 +101,13 @@
 
                         
                         <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/archives/">Archives</a>
                         </li>
                         
@@ -109,13 +116,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -193,6 +193,27 @@
 
 <div class="post-preview">
 
+    <a href="/2021/10/09/spring-ioc-step-02-newInstance/">
+        <h2 class="post-title">
+            spring-ioc-step-02-newInstance
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            在第一节中，当单例集合singletonObjects中不包含所要查询的bean时，则会根据 bean 的类信息来创建不包含具体信息的实例，即调用抽象类AbstractAutowireCapableBeanFactory中的beanDefinition.getBeanClass().newInstance()来实现，而实际中，创建的实例不仅有无参构造，还包含有参构造，因此就需要对上述过程加以......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Black Tom on
+        2021-10-09
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/2021/09/14/spring-ioc-step-02-cglib/">
         <h2 class="post-title">
             spring-ioc-step-02-cglib
@@ -217,7 +238,7 @@ Enhancer类在CGLIB库中，net.sf.cglib.proxy包下面的类主要负责实现�
 
     <a href="/2021/09/09/spring-ioc-step-02-reflection/">
         <h2 class="post-title">
-            spring-ioc-step-reflection
+            spring-ioc-step-02-reflection
         </h2>
         <h3 class="post-subtitle">
             
@@ -395,6 +416,12 @@ Hexo 依赖于 Node......
                         
                             
                         
+                            
+                        
+                            
+                        
+                            
+                            <a href="/tags/#spring-ioc" title="spring-ioc" rel="2">spring-ioc</a>
                             
                         
                             

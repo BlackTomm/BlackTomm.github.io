@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <!-- <link rel="shortcut icon" href="/img/favicon.ico"> -->
+    <!-- 自定义图标 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+
+    <title>
+        
+            spring-ioc-step-02-newInstance - BlackTom的博客 |  BlackTom&#39;s Blog
+                
+    </title>
+
+    <link rel="canonical" href="https://blacktomm.github.io/2021/10/09/spring-ioc-step-02-newInstance/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+        <!-- Custom CSS -->
+        
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+            <!-- Pygments Highlight CSS -->
+            
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+                <!-- Custom Fonts -->
+                <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+                <!-- Hux change font-awesome CDN to qiniu -->
+                <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+                <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+                <!-- ga & ba script hoook -->
+                <script></script>
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="BlackTom's Blog" type="application/atom+xml">
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">BlackTom&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header {
+        background-image: url('https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/my-blog/blog-config/back2.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                
+                    <h2>
+                        spring-ioc-step-02-newInstance
+                    </h2>
+                    <h3 class="subheading">
+                        
+                    </h3>
+                      <div class="tags">
+                        
+                            <a class="tag" href="/tags/#spring-ioc" title="spring-ioc">
+                                spring-ioc
+                            </a>
+                            
+                    </div>
+                    <br>
+                    <span class="meta">
+                        Posted by Black Tom on
+                        2021-10-09
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>在第一节中，当单例集合<code>singletonObjects</code>中不包含所要查询的bean时，则会根据 bean 的类信息来创建不包含具体信息的实例，即调用抽象类<code>AbstractAutowireCapableBeanFactory</code>中的<code>beanDefinition.getBeanClass().newInstance()</code>来实现，而实际中，创建的实例不仅有无参构造，还包含有参构造，因此就需要对上述过程加以完善。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test_BeanFactory</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-comment">// 1.初始化 BeanFactory</span><br>  DefaultListableBeanFactory beanFactory = <span class="hljs-keyword">new</span> DefaultListableBeanFactory();<br><br>  <span class="hljs-comment">// 2.注册 bean</span><br>  BeanDefinition beanDefinition = <span class="hljs-keyword">new</span> BeanDefinition(UserService<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>  beanFactory.registerBeanDefinition(<span class="hljs-string">"userService"</span>, beanDefinition);<br><br>  <span class="hljs-comment">// 3.第一次获取 bean</span><br>  UserService userService = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>);<br>  userService.queryUserInfo();<br>  System.out.println(<span class="hljs-string">"第一次获取："</span> + userService);<br><br>  <span class="hljs-comment">// 4.第二次获取 bean from Singleton</span><br>  UserService userService_singleton = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>);<br>  userService_singleton.queryUserInfo();<br>  System.out.println(<span class="hljs-string">"第二次获取："</span> + userService);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>本次修改主要以<code>AbstractBeanFactory#createBean</code>方法为核心，通过 Java 反射或 Cglib 来实现该方法的覆写，从而创建有参实例。第一节在调用<code>DefaultListableBeanFactory#getBean(beanName)</code>时，根据 beanName 进行查询，并不包含其他参数，因此创建的实例属性为默认值；当<code>getBean</code>方法中包含构造参数时，查找不到 bean 时则可根据传入参数创建实例，其类之间的关系如下所示：</p>
+<p><img src="https://blog-field-1258773891.cos.ap-beijing.myqcloud.com/record/2021%20/10/%2025/DefaultListableBeanFactory.png" alt="DefaultListableBeanFactory"></p>
+<p>首先在 BeanFactory接口中增加了<code>getBean(String name, Object... args)</code>方法，从而传递入参，当获取不到 bean 时，则需要创建实例。其抽象实现类<code>AbstractBeanFactory</code>自然也需要对相应方法进行修改，如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractBeanFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">DefaultSingletonBeanRegistry</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">BeanFactory</span> </span>&#123;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getBean</span><span class="hljs-params">(String name)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		<span class="hljs-keyword">return</span> doGetBean(name, <span class="hljs-keyword">null</span>);<br>	&#125;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getBean</span><span class="hljs-params">(String name, Object... args)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		<span class="hljs-keyword">return</span> doGetBean(name, args);<br>	&#125;<br><br>	<span class="hljs-keyword">protected</span> &lt;T&gt; <span class="hljs-function">T <span class="hljs-title">doGetBean</span><span class="hljs-params">(<span class="hljs-keyword">final</span> String name, <span class="hljs-keyword">final</span> Object[] args)</span> </span>&#123;<br>		Object bean = getSingleton(name);<br>		<span class="hljs-keyword">if</span> (bean != <span class="hljs-keyword">null</span>) &#123;<br>			<span class="hljs-keyword">return</span> (T) bean;<br>		&#125;<br>		BeanDefinition beanDefinition = getBeanDefinition(name);<br>		<span class="hljs-keyword">return</span> (T) createBean(name, beanDefinition, args);<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> BeanDefinition <span class="hljs-title">getBeanDefinition</span><span class="hljs-params">(String beanName)</span> <span class="hljs-keyword">throws</span> BeansException</span>;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> Object <span class="hljs-title">createBean</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition, Object[] args)</span> <span class="hljs-keyword">throws</span> BeansException</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通过对 getBean 方法中相同的逻辑进行抽离，得到 doGetBean 方法，因此createBean方法的入参也需要更加通用化，其具体实现位于<code>AbstractAutowireCapableBeanFactory</code>类中,<code>createBeanInstance</code>方法对应于具体的实例创建逻辑，通过 beanDefinition获取类信息，进而根据不同的实例化策略<code>CglibSubclassingInstantiationStrategy</code>与<code>SimpleInstantiationStrategy</code>来决定具体创建方式，默认选择 Cglib 策略进行创建。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractAutowireCapableBeanFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractBeanFactory</span> </span>&#123;<br><br>	<span class="hljs-keyword">private</span> InstantiationStrategy instantiationStrategy = <span class="hljs-keyword">new</span> CglibSubclassingInstantiationStrategy();<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> Object <span class="hljs-title">createBean</span><span class="hljs-params">(String beanName, BeanDefinition beanDefinition, Object[] args)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		Object bean = <span class="hljs-keyword">null</span>;<br>		bean = createBeanInstance(beanDefinition, beanName, args);<br><br>		addSingleton(beanName, bean);<br>		<span class="hljs-keyword">return</span> bean;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">protected</span> Object <span class="hljs-title">createBeanInstance</span><span class="hljs-params">(BeanDefinition beanDefinition, String beanName, Object[] args)</span> </span>&#123;<br>		Constructor constructorToUse = <span class="hljs-keyword">null</span>;<br><br>		Class&lt;?&gt; beanClass = beanDefinition.getBeanClass();<br>		Constructor&lt;?&gt;[] declaredConstructors = beanClass.getDeclaredConstructors();<br>		<span class="hljs-keyword">for</span> (Constructor constructor : declaredConstructors) &#123;<br>			<span class="hljs-keyword">if</span> (args != <span class="hljs-keyword">null</span> &amp;&amp; constructor.getParameterTypes().length == args.length) &#123;<br>				constructorToUse = constructor;<br>				<span class="hljs-keyword">break</span>;<br>			&#125;<br>		&#125;<br>		<span class="hljs-keyword">return</span> getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> InstantiationStrategy <span class="hljs-title">getInstantiationStrategy</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> instantiationStrategy;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setInstantiationStrategy</span><span class="hljs-params">(InstantiationStrategy instantiationStrategy)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.instantiationStrategy = instantiationStrategy;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>不同的创建策略则需对策略接口<code>InstantiationStrategy</code>中的<code>instantiate</code>方法进行覆写，第一种则是用原生的反射来实现</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleInstantiationStrategy</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">InstantiationStrategy</span> </span>&#123;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">instantiate</span><span class="hljs-params">(BeanDefinition beanDefinition, String beanName, Constructor constructor, Object[] args)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		Class clazz = beanDefinition.getBeanClass();<br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-keyword">if</span> (constructor != <span class="hljs-keyword">null</span>) &#123;<br>				<span class="hljs-keyword">return</span> clazz.getDeclaredConstructor(constructor.getParameterTypes()).newInstance(args);<br>			&#125; <span class="hljs-keyword">else</span> &#123;<br>				<span class="hljs-keyword">return</span> clazz.getDeclaredConstructor().newInstance();<br>			&#125;<br>		&#125; <span class="hljs-keyword">catch</span> (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) &#123;<br>			<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BeansException(<span class="hljs-string">"Failed to instantiate ["</span> + clazz.getName() + <span class="hljs-string">"]"</span>, e);<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>第二种则是Cglib 的 Enhancer 来创建</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CglibSubclassingInstantiationStrategy</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">InstantiationStrategy</span> </span>&#123;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">instantiate</span><span class="hljs-params">(BeanDefinition beanDefinition, String beanName, Constructor constructor, Object[] args)</span> <span class="hljs-keyword">throws</span> BeansException </span>&#123;<br>		Enhancer enhancer = <span class="hljs-keyword">new</span> Enhancer();<br>		enhancer.setSuperclass(beanDefinition.getBeanClass());<br>		enhancer.setCallback(<span class="hljs-keyword">new</span> NoOp() &#123;<br>			<span class="hljs-meta">@Override</span><br>			<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hashCode</span><span class="hljs-params">()</span> </span>&#123;<br>				<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.hashCode();<br>			&#125;<br>		&#125;);<br>		<span class="hljs-keyword">if</span> (constructor == <span class="hljs-keyword">null</span>) &#123;<br>			<span class="hljs-keyword">return</span> enhancer.create();<br>		&#125;<br>		<span class="hljs-keyword">return</span> enhancer.create(constructor.getParameterTypes(), args);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里并未考虑入参形式与构造函数的多种匹配情况，实际中则需要考虑入参数目以及参数类型匹配顺序等。接下来可以对上述实例化进行测试验证，先给定一个包含多种构造函数的Userservice类</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span> </span>&#123;<br><br>	<span class="hljs-keyword">private</span> String name;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserService</span><span class="hljs-params">()</span> </span>&#123;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserService</span><span class="hljs-params">(String name)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.name = name;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">queryUserInfo</span><span class="hljs-params">()</span></span>&#123;<br>		System.out.println(<span class="hljs-string">"查询用户信息"</span>);<br>	&#125;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">"UserService&#123;"</span> +<br>				<span class="hljs-string">"name='"</span> + name + <span class="hljs-string">'\''</span> +<br>				<span class="hljs-string">'&#125;'</span>;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>并进行测试</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test_BeanFactory</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-comment">// 1.初始化 BeanFactory</span><br>  DefaultListableBeanFactory beanFactory = <span class="hljs-keyword">new</span> DefaultListableBeanFactory();<br><br>  <span class="hljs-comment">// 2.注册 bean</span><br>  BeanDefinition beanDefinition = <span class="hljs-keyword">new</span> BeanDefinition(UserService<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>  beanFactory.registerBeanDefinition(<span class="hljs-string">"userService"</span>, beanDefinition);<br><br>  <span class="hljs-comment">// 3.第一次获取 bean</span><br>  UserService userService = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>, <span class="hljs-string">"jim"</span>);<br>  userService.queryUserInfo();<br><br>  <span class="hljs-comment">// 4.第二次获取 bean from Singleton</span><br>  UserService userService_singleton = (UserService) beanFactory.getBean(<span class="hljs-string">"userService"</span>);<br>  userService_singleton.queryUserInfo();<br>&#125;<br><br><span class="hljs-comment">//输出结果</span><br>查询用户信息<br>查询用户信息<br></code></pre></td></tr></table></figure>
+
+<p>完整代码见<a href="https://github.com/BlackTomm/small-spring/tree/master/small-spring-step-03" target="_blank" rel="noopener">small-spring-step-03</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://github.com/fuzhengwei/small-spring" target="_blank" rel="noopener">Spring 手撸专栏</a></li>
+<li><a href="https://juejin.cn/book/6857911863016390663/section" target="_blank" rel="noopener">从 0 开始深入学习 Spring</a></li>
+</ul>
+
+
+                    <hr>
+
+
+                    
+
+                            <ul class="pager">
+                                
+                                        
+                                            <li class="next">
+                                                <a href="/2021/09/14/spring-ioc-step-02-cglib/" data-toggle="tooltip" data-placement="top" title="spring-ioc-step-02-cglib">Next &rarr;</a>
+                                            </li>
+                                            
+                            </ul>
+
+                            
+
+                                    
+
+                                            
+                                                <!-- gitalk 评论框 start -->
+                                                <div class="comment">
+                                                    <div id="gitalk-container"></div>
+                                                </div>
+                                                <!-- gitalk 评论框 end -->
+                                                
+            </div>
+
+            <!-- Side Catalog Container -->
+            
+
+                    <!-- Sidebar Container -->
+
+                    <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                        <!-- Featured Tags -->
+                        
+
+                                <!-- Friends Blog -->
+                                
+                    </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+        
+
+                
+                    <!-- Gitalk start -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+                    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+                    <script>
+                        var gitalk = new Gitalk({
+                            id: window.location.pathname, // Ensure uniqueness and length less than 50
+                            clientID: "ce99489e27f66d998fe1",
+                            clientSecret: "fd0bba05f585432aa988cab6c1667a8c5575755f",
+                            repo: "blacktomm.github.io",
+                            owner: "blacktomm",
+                            admin: "blacktomm",
+                            id: location.pathname,
+                            distractionFreeMode: false // Facebook-like distraction free mode
+                        })
+                        gitalk.render('gitalk-container')
+                    </script>
+                    <!-- Gitalk end -->
+                    
+
+
+
+
+                        
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; BlackTom&#39;s Blog 2021 |<a href="http://beian.miit.gov.c" target="_blank">
+                        鄂ICP备20013606号
+                    </a>
+                    <br>
+                    Theme by <a href="http://huangxuan.me" target="_blank" rel="noopener">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks" target="_blank" rel="noopener">Kaijun</a>  
+                    <!-- <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://blacktomm.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-48901276-3';
+    var _gaDomain = 'blacktom.top';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://blacktomm.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
